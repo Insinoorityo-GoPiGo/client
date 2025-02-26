@@ -16,6 +16,7 @@ def logic_loop():
 
         elif command == "DRIVE_FORWARD":
             client_controller.drive_forward()
+            client_controller.next_node_reached()
             server_api.send_confirmation_to_server(message="DRIVE_OK")
 
         elif command == "SHUTDOWN":
