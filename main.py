@@ -1,16 +1,27 @@
 import threading
+import asyncio
 
 from ServerAPI import ServerAPI
 from ClientController import ClientController
 
-server_api = ServerAPI()
+loop = asyncio.get_event_loop()
+
+server_api = ServerAPI(server_address="127.0.0.1", server_port=1025)
 client_controller = ClientController()
 
-def logic_loop():
+async def logic_loop():
+    print("Before while")
     while True:
-        command = server_api.receive_command_from_server()
+        print("Waiting for a message from the server.")
+        command = await server_api.receive_command_from_server()
+        print("Received a command from the server: ", command)
         
-        if command == "TURN_RIGHT" or command == "TURN_TWICE_RIGHT" or command == "TURN_LEFT":
+        if command == "ARE_YOU_READY":
+            print("Is ready.")
+            server_api.send_confirmation_to_server(message="I_AM_READY")
+            pass
+
+        elif command == "TURN_RIGHT" or command == "TURN_TWICE_RIGHT" or command == "TURN_LEFT":
             client_controller.turn(where=command)
             server_api.send_confirmation_to_server(message="TURN_OK")
 
@@ -22,8 +33,11 @@ def logic_loop():
         elif command == "SHUTDOWN":
             break
 
+async def run():
+    await logic_loop()
+
 def main():
-    logic_loop()
+    loop.run_until_complete(future=run())
 
 if __name__ == "__main__":
     main()

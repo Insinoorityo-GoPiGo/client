@@ -12,10 +12,8 @@ class ServerAPI:
         self.client_socket.connect(self.server_info)
 
     async def receive_command_from_server(self):
-        data = await self.client_socket.recv(1024)
-        data = json.loads(data) 
+        data = json.loads(s=self.client_socket.recv(1024))
         return data["command"]
-
 
     def send_confirmation_to_server(self, message):
         if message == "I_AM_READY" or message == "DRIVE_OK" or message == "TURN_OK":
@@ -23,4 +21,6 @@ class ServerAPI:
         else:
             message = "INVALID_CONFIRMATION"
             
-        self.client_socket.send(message)
+        message = json.dumps(message)
+        
+        self.client_socket.send(message.encode())
