@@ -33,11 +33,8 @@ async def logic_loop():
         elif command == "SHUTDOWN":
             break
 
-async def run():
+async def main():
     await logic_loop()
 
-def main():
-    loop.run_until_complete(future=run())
-
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
