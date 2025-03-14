@@ -26,8 +26,7 @@ async def logic_loop():
             server_api.send_confirmation_to_server(message="TURN_OK")
 
         elif command == "DRIVE_FORWARD":
-            client_controller.drive_forward()
-            client_controller.next_node_reached()
+            client_controller.follow_line()
             server_api.send_confirmation_to_server(message="DRIVE_OK")
 
         elif command == "SHUTDOWN":
