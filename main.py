@@ -33,6 +33,9 @@ async def logic_loop():
         elif command == "SHUTDOWN":
             break
 
+        else:
+            pass
+
 async def main():
     await logic_loop()
 
