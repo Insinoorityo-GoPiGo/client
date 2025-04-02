@@ -33,6 +33,9 @@ class ClientController:
     def follow_line(self):
         try: 
             while True:
+
+                self.line_follower = EasyLineFollower()
+                time.sleep(0.2)
                 position = self.line_follower.read_position()
 
                 if position == "center":

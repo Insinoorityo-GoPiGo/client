@@ -11,7 +11,7 @@ class ServerAPI:
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client_socket.connect(self.server_info)
 
-    async def receive_command_from_server(self):
+    def receive_command_from_server(self):
         data = json.loads(s=self.client_socket.recv(1024))
         return data["command"]
 
