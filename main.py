@@ -1,10 +1,5 @@
-import threading
-import asyncio
-
 from ServerAPI import ServerAPI
 from ClientController import ClientController
-
-loop = asyncio.get_event_loop()
 
 server_api = ServerAPI(server_address="127.0.0.1", server_port=1025)
 client_controller = ClientController()
@@ -25,6 +20,7 @@ def logic_loop():
             server_api.send_confirmation_to_server(message="TURN_OK")
 
         elif command == "DRIVE_FORWARD":
+            client_controller.start_detecting_nodes()
             client_controller.follow_line()
             server_api.send_confirmation_to_server(message="DRIVE_OK")
 

@@ -2,6 +2,7 @@ import time
 import easygopigo3 as easy
 from di_sensors.easy_line_follower import EasyLineFollower
 from mfrc522 import SimpleMFRC522
+import threading
 
 class ClientController:
     def __init__(self):
@@ -11,6 +12,9 @@ class ClientController:
 
         self.base_speed = 100
         self.turn_speed = 140
+
+        self.node_detected_event = threading.Event()
+        self.node_detected_thread = None
 
     def detect_rfid_node(self):
         try:
@@ -29,13 +33,17 @@ class ClientController:
         except Exception as e:
             #print(f"RFID error: {e}")
             return False
+        
+
 
     def follow_line(self):
         try: 
             while True:
 
+                left_speed = 0
+                right_speed = 0
+
                 self.line_follower = EasyLineFollower()
-                time.sleep(0.2)
                 position = self.line_follower.read_position()
 
                 if position == "center":
@@ -64,13 +72,15 @@ class ClientController:
                 # Debug Output
                 print(f"Pos: {position}, L-Speed: {left_speed}, R-Speed: {right_speed}")
 
-                detected = self.detect_rfid_node()
+                #if self.detect_rfid_node()
 
-                if detected:  
+                if self.node_detected_event.is_set():
+                    self.node_detected_event.clear()
                     print("Stopping at node!")
                     self.gpg.stop()
                     time.sleep(0.5)
                     break
+                    
                 
 
         except KeyboardInterrupt:
@@ -92,3 +102,13 @@ class ClientController:
         self.gpg.turn_degrees(turn)
         time.sleep(0.5)
 
+    def start_detecting_nodes(self):
+        def node_detecting_logic():
+            while True:
+                if self.detect_rfid_node():
+                    self.node_detected_event.set()
+                    break
+                else:
+                    time.sleep(0.25)
+
+        threading.Thread(target=node_detecting_logic, daemon=True).start()
