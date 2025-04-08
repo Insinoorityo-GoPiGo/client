@@ -14,7 +14,6 @@ class ClientController:
         self.turn_speed = 140
 
         self.node_detected_event = threading.Event()
-        self.node_detected_thread = None
 
     def detect_rfid_node(self):
         try:
@@ -45,21 +44,21 @@ class ClientController:
             time.sleep(0.5)        
 
         try: 
-            while True:
+            while self.node_detected_event.is_set() is not True:
 
                 left_speed = 0
                 right_speed = 0
 
-                if self.node_detected_event.is_set():
-                    stop_gopigo()
-                    break
+                #if self.node_detected_event.is_set():
+                #    stop_gopigo()
+                #    break
 
                 self.line_follower = EasyLineFollower()
                 position = self.line_follower.read_position()
 
-                if self.node_detected_event.is_set():
-                    stop_gopigo()
-                    break
+                #if self.node_detected_event.is_set():
+                #    stop_gopigo()
+                #    break
 
                 if position == "center":
                     left_speed = self.base_speed
@@ -81,9 +80,9 @@ class ClientController:
                     left_speed = 0
                     right_speed = 0
 
-                if self.node_detected_event.is_set():
-                    stop_gopigo()
-                    break
+                #if self.node_detected_event.is_set():
+                #    stop_gopigo()
+                #    break
 
                 self.gpg.set_motor_dps(self.gpg.MOTOR_LEFT, left_speed)
                 self.gpg.set_motor_dps(self.gpg.MOTOR_RIGHT, right_speed)
@@ -93,11 +92,18 @@ class ClientController:
 
                 #if self.detect_rfid_node()
 
-                if self.node_detected_event.is_set():
-                    stop_gopigo()
-                    break
+                #if self.node_detected_event.is_set():
+                #    stop_gopigo()
+                #    break
+
+            stop_gopigo()
                     
         except KeyboardInterrupt:
+            self.gpg.stop()
+            exit(0)
+        
+        except Exception as e:
+            print("An exception has occured: ",e)
             self.gpg.stop()
             exit(0)
 
