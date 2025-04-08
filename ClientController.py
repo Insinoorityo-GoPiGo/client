@@ -29,8 +29,13 @@ class ClientController:
             #print(f"RFID Tag detected: {node_id}")
             return True
     
+        except OSError as e:
+            print(f"RFID OSError IN detect_rfid_node: {e}")
+            time.sleep(1)  # cooldown before next attempt
+            return False
+
         except Exception as e:
-            #print(f"RFID error: {e}")
+            print(f"RFID GENERAL ERROR IN detect_rfid_node: {e}")
             return False
         
 
