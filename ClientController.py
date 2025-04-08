@@ -52,8 +52,7 @@ class ClientController:
                 #if self.node_detected_event.is_set():
                 #    stop_gopigo()
                 #    break
-
-                self.line_follower = EasyLineFollower()
+                
                 position = self.line_follower.read_position()
 
                 #if self.node_detected_event.is_set():
