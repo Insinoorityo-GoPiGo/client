@@ -37,14 +37,29 @@ class ClientController:
 
 
     def follow_line(self):
+
+        def stop_gopigo():
+            self.node_detected_event.clear()
+            print("Stopping at node!")
+            self.gpg.stop()
+            time.sleep(0.5)        
+
         try: 
             while True:
 
                 left_speed = 0
                 right_speed = 0
 
+                if self.node_detected_event.is_set():
+                    stop_gopigo()
+                    break
+
                 self.line_follower = EasyLineFollower()
                 position = self.line_follower.read_position()
+
+                if self.node_detected_event.is_set():
+                    stop_gopigo()
+                    break
 
                 if position == "center":
                     left_speed = self.base_speed
@@ -66,6 +81,10 @@ class ClientController:
                     left_speed = 0
                     right_speed = 0
 
+                if self.node_detected_event.is_set():
+                    stop_gopigo()
+                    break
+
                 self.gpg.set_motor_dps(self.gpg.MOTOR_LEFT, left_speed)
                 self.gpg.set_motor_dps(self.gpg.MOTOR_RIGHT, right_speed)
 
@@ -75,14 +94,9 @@ class ClientController:
                 #if self.detect_rfid_node()
 
                 if self.node_detected_event.is_set():
-                    self.node_detected_event.clear()
-                    print("Stopping at node!")
-                    self.gpg.stop()
-                    time.sleep(0.5)
+                    stop_gopigo()
                     break
                     
-                
-
         except KeyboardInterrupt:
             self.gpg.stop()
             exit(0)
