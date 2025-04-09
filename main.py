@@ -28,6 +28,7 @@ def logic_loop():
             break
 
         else:
+            print("No command was received, else block in main.py")
             pass
 
 def main():

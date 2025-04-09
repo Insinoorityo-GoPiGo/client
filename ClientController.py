@@ -17,7 +17,7 @@ class ClientController:
 
     def detect_rfid_node(self):
         try:
-            node_id, _ = self.rfid_reader.read()  # Read the tag
+            node_id = self.rfid_reader.read()  # Read the tag
             
             # Check if this node was already read
             if hasattr(self, "last_rfid_id") and node_id == self.last_rfid_id:
