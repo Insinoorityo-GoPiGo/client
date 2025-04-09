@@ -1,7 +1,7 @@
 from ServerAPI import ServerAPI
 from ClientController import ClientController
 
-server_api = ServerAPI(server_address="127.0.0.1", server_port=1025)
+server_api = ServerAPI(server_address="192.168.53.87", server_port=1025)
 client_controller = ClientController()
 
 def logic_loop():

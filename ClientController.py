@@ -3,6 +3,7 @@ import easygopigo3 as easy
 from di_sensors.easy_line_follower import EasyLineFollower
 from mfrc522 import SimpleMFRC522
 import threading
+import traceback
 
 class ClientController:
     def __init__(self):
@@ -17,7 +18,13 @@ class ClientController:
 
     def detect_rfid_node(self):
         try:
-            node_id, _ = self.rfid_reader.read()  # Read the tag
+            result = self.rfid_reader.read()  # Read the tag
+            print("Resutl: ", result)
+
+            if isinstance(result, tuple):
+                node_id = result[0]
+            else:
+                node_id = result
             
             # Check if this node was already read
             if hasattr(self, "last_rfid_id") and node_id == self.last_rfid_id:
@@ -26,7 +33,7 @@ class ClientController:
             
             # Store the last detected RFID tag
             self.last_rfid_id = node_id
-            #print(f"RFID Tag detected: {node_id}")
+            print(f"RFID Tag detected: {node_id}")
             return True
     
         except OSError as e:
@@ -38,6 +45,20 @@ class ClientController:
             print(f"RFID GENERAL ERROR IN detect_rfid_node: {e}")
             return False
         
+    def safe_read_position(self, retries=3, delay=0.1):
+        for attempt in range(retries):
+            try:
+                return self.line_follower.read_position()
+            except TypeError as e:
+                print(f"[Line Follower Error] TypeError (attempt {attempt+1}): {e}")
+            except OSError as e:
+                print(f"[Line Follower Error] OSError (attempt {attempt+1}): {e}")
+            except Exception as e:
+                print(f"[Line Follower Error] Unexpected error (attempt {attempt+1}): {e}")
+            time.sleep(delay)
+        print("[Line Follower Error] All attempts failed. Defaulting to 'white'.")
+        return "white"  # Safe fallback
+
 
 
     def follow_line(self):
@@ -58,7 +79,7 @@ class ClientController:
                 #    stop_gopigo()
                 #    break
                 
-                position = self.line_follower.read_position()
+                position = self.safe_read_position()
 
                 #if self.node_detected_event.is_set():
                 #    stop_gopigo()
@@ -92,7 +113,7 @@ class ClientController:
                 self.gpg.set_motor_dps(self.gpg.MOTOR_RIGHT, right_speed)
 
                 # Debug Output
-                print(f"Pos: {position}, L-Speed: {left_speed}, R-Speed: {right_speed}")
+                #print(f"Pos: {position}, L-Speed: {left_speed}, R-Speed: {right_speed}")
 
                 #if self.detect_rfid_node()
 
@@ -107,7 +128,8 @@ class ClientController:
             exit(0)
         
         except Exception as e:
-            print("An exception has occured: ",e)
+            print("An exception has occured: ")
+            traceback.print_exc()
             self.gpg.stop()
             exit(0)
 
