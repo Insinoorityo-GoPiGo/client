@@ -149,7 +149,10 @@ class ClientController:
         time.sleep(0.5)
 
     def start_detecting_nodes(self):
+        
         def node_detecting_logic():
+            time.sleep(2)
+
             while True:
                 if self.detect_rfid_node():
                     self.node_detected_event.set()
