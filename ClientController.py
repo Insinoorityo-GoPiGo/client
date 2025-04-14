@@ -135,6 +135,7 @@ class ClientController:
         time.sleep(0.5)
 
     def start_detecting_nodes(self):
+        
         def node_detecting_logic():
             time.sleep(1.5)
             while True:
